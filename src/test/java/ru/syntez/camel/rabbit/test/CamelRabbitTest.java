@@ -1,8 +1,5 @@
 package ru.syntez.camel.rabbit.test;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.xml.JacksonXmlModule;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -20,13 +17,6 @@ import java.nio.file.Paths;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class CamelRabbitTest {
-
-    private final static ObjectMapper xmlMapper;
-    static {
-        JacksonXmlModule xmlModule = new JacksonXmlModule();
-        xmlModule.setDefaultUseWrapper(false);
-        xmlMapper = new XmlMapper(xmlModule);
-    }
 
     @Configuration
     public static class Config {
