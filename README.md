@@ -18,11 +18,13 @@ Library name: camel-rabbit
 
 Ссылки на использованную документацию:
 https://camel.apache.org/manual/latest/pojo-consuming.html
+
 https://guilhermebmilagre.medium.com/spring-boot-2-x-apache-camel-rabbitmq-5339f7848a87
 
 JMeter:
 Установка плагина Rabbit 
 https://martkos-it.co.uk/blog/jmeter-amp-rabbit-mq
+
 Запуск
 https://jmeter.apache.org/usermanual/get-started.html
 
