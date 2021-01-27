@@ -1,0 +1,21 @@
+logging:
+  config: classpath:log4j2.xml
+server:
+  application-name: consumer-order-service
+  work-time: 100
+  rabbitmq:
+    queues:
+      input-endpoint: rabbitmq://documentExchange?queue=inputqueue&concurrentConsumers=20&threadPoolSize=20&prefetchCount=10&prefetchSize=0&prefetchGlobal=false&prefetchEnabled=true
+      output-order-endpoint: rabbitmq://orderExchange?queue=outputorder
+camel:
+  component:
+    rabbitmq:
+      host: localhost
+      port: 5672
+      username: user
+      password: user
+      channel-pool-max-size: 20
+      durable: true
+      auto-delete: false
+      auto-ack: true
+      vhost: user
