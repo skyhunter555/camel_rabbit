@@ -1,7 +1,7 @@
 logging:
   config: classpath:log4j2.xml
 server:
-  application-name: consumer-order-service
+  application-name: camel-rabbit-service
   work-time: 100
   rabbitmq:
     queues:

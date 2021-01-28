@@ -19,15 +19,17 @@ public class CamelConsumer {
 
     @Value("${server.work-time}")
     private Integer delayMillis = 100;
+    private Integer consumedDocumentCount = 0;
 
     public void execute(RoutingDocument document) {
 
         LOG.info("START CONSUME MESSAGE, docId: {} docType: {}", document.getDocId(), document.getDocType());
         try {
             Thread.sleep(delayMillis);
+            consumedDocumentCount++;
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        LOG.info("FINISH CONSUME MESSAGE, docId: {} docType: {}", document.getDocId(), document.getDocType());
+        LOG.info("FINISH CONSUME MESSAGE, docId: {} docType: {}. Total consumed: {}", document.getDocId(), document.getDocType(), consumedDocumentCount);
     }
 }

@@ -2,6 +2,7 @@ package ru.syntez.camel.rabbit.component;
 
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.converter.jaxb.JaxbDataFormat;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ru.syntez.camel.rabbit.entities.RoutingDocument;
@@ -24,11 +25,18 @@ public class CamelRouteBuilder extends RouteBuilder {
 
     private JaxbDataFormat xmlDataFormat = new JaxbDataFormat();
 
+    private final CamelErrorProcessor errorProcessor;
+    public CamelRouteBuilder(CamelErrorProcessor errorProcessor) {
+        this.errorProcessor = errorProcessor;
+    }
+
     @Override
     public void configure() throws Exception {
 
         JAXBContext context = JAXBContext.newInstance(RoutingDocument.class);
         xmlDataFormat.setContext(context);
+
+        onException(Exception.class).process(errorProcessor).log("******** ERROR ON ROUTING ").handled(true);
 
         from(queueInputEndpoint)
             .log("******** ROUTING FROM INPUT QUEUE TO OUTPUT")
