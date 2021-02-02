@@ -17,5 +17,5 @@ camel:
       channel-pool-max-size: 20
       durable: true
       auto-delete: false
-      auto-ack: true
+      auto-ack: false
       vhost: user

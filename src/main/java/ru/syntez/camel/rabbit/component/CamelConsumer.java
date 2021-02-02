@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ru.syntez.camel.rabbit.entities.RoutingDocument;
+import ru.syntez.camel.rabbit.exceptions.RouterException;
 
 /**
  * Configuration custom CamelRouteBuilder
@@ -24,6 +25,9 @@ public class CamelConsumer {
     public void execute(RoutingDocument document) {
 
         LOG.info("START CONSUME MESSAGE, docId: {} docType: {}", document.getDocId(), document.getDocType());
+        if (consumedDocumentCount > 10) {
+            throw new RouterException("ConsumedDocumentCount > 10. Rollback");
+        }
         try {
             Thread.sleep(delayMillis);
             consumedDocumentCount++;
