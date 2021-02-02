@@ -5,8 +5,6 @@ import org.apache.camel.converter.jaxb.JaxbDataFormat;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ru.syntez.camel.rabbit.entities.RoutingDocument;
-import ru.syntez.camel.rabbit.exceptions.RouterException;
-
 import javax.xml.bind.JAXBContext;
 
 /**
@@ -47,14 +45,14 @@ public class CamelRouteBuilder extends RouteBuilder {
             .to(queueOutputOrderEndpoint);
 
         from(queueOutputOrderEndpoint)
-                .transacted()
+            //.transacted() //TODO реализовать через соединение в JmsConfig
             .doTry().unmarshal(xmlDataFormat)
             .log("******** PROCESS MESSAGE FROM OUTPUT QUEUE")
-            //.to("bean:camelConsumer?method=execute(${body})");
-            .doTry()
-                .bean("camelConsumer", "execute(${body})")
-            .doCatch(RouterException.class)
-                .rollback()
-            .end();
+            .bean("camelConsumer", "execute(${body})");
+            //.doTry()
+            //    .bean("camelConsumer", "execute(${body})")
+            //.doCatch(RouterException.class)
+            //    .markRollbackOnly()
+            //.end();
     }
 }

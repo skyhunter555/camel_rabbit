@@ -1,64 +1,52 @@
 package ru.syntez.camel.rabbit.test;
 
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
+import com.rabbitmq.jms.admin.RMQConnectionFactory;
+import com.rabbitmq.jms.admin.RMQDestination;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.test.context.junit4.SpringRunner;
+import javax.jms.Connection;
+import javax.jms.MessageProducer;
+import javax.jms.Session;
+import javax.jms.TextMessage;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest
 public class CamelRabbitTest {
 
-    @Configuration
-    public static class Config {
-
-        @Value("${camel.component.rabbitmq.host}")
-        private String brokerHost = "localhost";
-
-        @Value("${camel.component.rabbitmq.port}")
-        private Integer brokerPort = 5672;
-
-        @Value("${camel.component.rabbitmq.username}")
-        private String username = "user";
-
-        @Value("${camel.component.rabbitmq.password}")
-        private String password = "user";
-
-        @Bean
-        public ConnectionFactory connectionFactory() {
-            ConnectionFactory connectionFactory = new ConnectionFactory();
-            connectionFactory.setHost("localhost");
-            connectionFactory.setPort(brokerPort);
-            connectionFactory.setUsername(username);
-            connectionFactory.setPassword(password);
-            connectionFactory.setVirtualHost(username);
-            connectionFactory.setRequestedChannelMax(1);
-            return connectionFactory;
-        }
-    }
-
-    private String queueInputEndpoint = "inputqueue";
-
-    @Autowired
-    ConnectionFactory connectionFactory;
-
     @Test
     public void sendMessageToInputQueueTest() {
+        RMQConnectionFactory connectionFactory = new RMQConnectionFactory();
+        connectionFactory.setUsername("user");
+        connectionFactory.setPassword("user");
+        connectionFactory.setVirtualHost("user");
+        connectionFactory.setHost("localhost");
+        connectionFactory.setPort(5672);
+
+        RMQDestination jmsDestination = new RMQDestination();
+        jmsDestination.setAmqp(false);
+        jmsDestination.setQueue(true);
+        jmsDestination.setAmqpExchangeName("documentExchange");
+        jmsDestination.setAmqpRoutingKey("inputqueue");
+        jmsDestination.setDestinationName("inputqueue");
+        jmsDestination.setAmqpQueueName("inputqueue");
+
+        Connection connection = null;
+
         try {
+            connection = connectionFactory.createConnection();
+            connection.start();
+            Session session = connection.createSession(true, Session.SESSION_TRANSACTED);
+            MessageProducer producer = session.createProducer(jmsDestination);
+
             String messageXml = new String(Files.readAllBytes(Paths.get(getClass().getResource("/router_doc_1.xml").toURI())));
-            Connection connection = connectionFactory.newConnection();
-            Channel channel = connection.createChannel();
-            channel.queueDeclare(queueInputEndpoint, true, false, false, null);
-            channel.basicPublish("", queueInputEndpoint, null, messageXml.getBytes());
+            TextMessage textMessage = session.createTextMessage("Test message");
+            textMessage.setJMSType("TextMessage");
+            textMessage.setText(messageXml);
+            producer.send(textMessage);
+            session.commit();
+            session.close();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
